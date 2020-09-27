@@ -34,7 +34,14 @@ class App extends Component {
       imageURL: '',
       box: {},
       route: 'signin',
-      isSignedIn: false
+      isSignedIn: false,
+      user: {
+        email: '',
+        id:'',
+        name:'',
+        entries: 0,
+        joined: ''
+      }
     }
   }
 
@@ -49,6 +56,16 @@ class App extends Component {
         rightCol: width - (clarifaiFace.right_col * width),
         bottomRow: height -(clarifaiFace.bottom_row * height)}
     })
+  }
+
+  loadUser = (data) => {
+    this.setState({user: {
+      email: data.email,
+      id: data.id,
+      name: data.name,
+      entries: data.entries,
+      joined: data.joined
+    }});
   }
 
   onRouteChange = (route) => {
@@ -92,7 +109,7 @@ class App extends Component {
             : (
                 route === 'signin'
                 ? <Signin onRouteChange={this.onRouteChange}/>
-                : <Register onRouteChange={this.onRouteChange}/>
+                : <Register onRouteChange={this.onRouteChange} loadUser={this.loadUser}/>
             )
         }
       </div>
