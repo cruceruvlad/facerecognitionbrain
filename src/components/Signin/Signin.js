@@ -22,9 +22,11 @@ class Signin extends Component {
             method: 'post',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({email:this.state.signInEmail, password: this.state.signInPassword})
-        }).then(res => res.json()).then(data => {
-            if(data === 'success')
+        }).then(res => res.json()).then(user => {
+            if(user.id){
+                this.props.loadUser(user);
                 this.props.onRouteChange('home');
+            }
         });
     }
 
