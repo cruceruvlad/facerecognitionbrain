@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import Navigation from './components/navigation/Navigation.js';
 import Particles from 'react-particles-js';
-import Clarifai from 'clarifai';
 import Logo from './components/logo/Logo.js';
 import ImageLinkForm from './components/ImageLinkForm/ImageLinkForm.js';
 import Signin from './components/Signin/Signin.js';
@@ -22,14 +21,7 @@ const particlesOption = {
   }               
 }
 
-const app = new Clarifai.App({
-  apiKey: '4d69b5b18c3745c88d6785625fa4aa6a'
- });
-
-class App extends Component {
-  constructor() {
-    super();
-    this.state = {
+const initialState = {
       input: '',
       imageURL: '',
       box: {},
@@ -43,6 +35,11 @@ class App extends Component {
         joined: ''
       }
     }
+
+class App extends Component {
+  constructor() {
+    super();
+    this.state = initialState;
   }
 
   calculateFaceLocation = (data) => {
@@ -69,12 +66,13 @@ class App extends Component {
   }
 
   onRouteChange = (route) => {
-    if(route === 'signin') {
-      this.setState({isSignedIn: false});
-    } else if(route === 'home') {
+    if(route === 'signin')
+      this.setState(initialState);
+    else if(route === 'home') {
       this.setState({isSignedIn: true});
-    }
-    this.setState({route: route});
+      this.setState({route: route});
+    } else
+      this.setState({route: route});
   }
 
   onInputChange = (event) => {
@@ -83,10 +81,11 @@ class App extends Component {
 
   onSubmit = (event) => {
     this.setState({imageURL: this.state.input});
-    app.models
-      .predict(
-        Clarifai.FACE_DETECT_MODEL,
-        this.state.input)
+      fetch('http://localhost:3000/imageurl', {
+        method: 'post',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({input:this.state.input})
+      }).then(res => res.json())
       .then(response => {
         if(response)
           fetch('http://localhost:3000/image', {
@@ -95,7 +94,7 @@ class App extends Component {
             body: JSON.stringify({id:this.state.user.id})
         }).then(res => res.json()).then(count => {
           this.setState(Object.assign(this.state.user,{entries: count}))
-        })
+        });
         this.calculateFaceLocation(response);
       })
       .catch(err => console.log(err));
